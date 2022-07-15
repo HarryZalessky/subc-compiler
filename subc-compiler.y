@@ -5,6 +5,7 @@
 extern FILE *fp;
 FILE * f1;
 
+
 %}
 
 %token INT VOID UINT
@@ -169,16 +170,16 @@ int main(int argc, char *argv[])
     return 0;
 }
          
-yyerror(char *s) {
+void yyerror(char *s) {
 	printf("Syntex Error in line number : %d : %s %s\n", yylineno, s, yytext );
 }
     
-push()
+void push()
 {
   	strcpy(st[++top],yytext);
 }
 
-codegen_logical()
+void codegen_logical()
 {
  	sprintf(temp,"$t%d",i);
   	fprintf(f1,"%s\t=\t%s\t%s\t%s\n",temp,st[top-2],st[top-1],st[top]);
@@ -187,7 +188,7 @@ codegen_logical()
  	i++;
 }
 
-codegen_algebric()
+void codegen_algebric()
 {
  	sprintf(temp,"$t%d",i); // converts temp to reqd format
   	fprintf(f1,"%s\t=\t%s\t%s\t%s\n",temp,st[top-2],st[top-1],st[top]);
@@ -195,13 +196,13 @@ codegen_algebric()
  	strcpy(st[top],temp);
  	i++;
 }
-codegen_assign()
+void codegen_assign()
 {
  	fprintf(f1,"%s\t=\t%s\n",st[top-2],st[top]);
  	top-=3;
 }
  
-if_label1()
+void if_label1()
 {
  	lnum++;
  	fprintf(f1,"\tif( not %s)",st[top]);
@@ -209,7 +210,7 @@ if_label1()
  	label[++ltop]=lnum;
 }
 
-if_label2()
+void if_label2()
 {
 	int x;
 	lnum++;
@@ -219,27 +220,27 @@ if_label2()
 	label[++ltop]=lnum;
 }
 
-if_label3()
+void if_label3()
 {
 	int y;
 	y=label[ltop--];
 	fprintf(f1,"$L%d: \n",y);
 	top--;
 }
-while_start()
+void while_start()
 {
 	lnum++;
 	label[++ltop]=lnum;
 	fprintf(f1,"$L%d:\n",lnum);
 }
-while_rep()
+void while_rep()
 {
 	lnum++;
  	fprintf(f1,"if( not %s)",st[top]);
  	fprintf(f1,"\tgoto $L%d\n",lnum);
  	label[++ltop]=lnum;
 }
-while_end()
+void while_end()
 {
 	int x,y;
 	y=label[ltop--];
@@ -248,7 +249,7 @@ while_end()
 	fprintf(f1,"$L%d: \n",y);
 	top--;
 }
-switch_start()
+void switch_start()
 {
 	lnum++;
 	label[++ltop]=lnum;
@@ -256,7 +257,7 @@ switch_start()
 	label[++ltop]=lnum;
 	switch_stack[++stop]=1;
 }
-switch_case()
+void switch_case()
 {
 	int x,y,z;
 	z=switch_stack[stop--];
@@ -279,26 +280,26 @@ switch_case()
  		fprintf(f1,"$L%d:\n",y);
  	}
 }
-switch_default()
+void switch_default()
 {
 	int x=label[ltop--];
 	fprintf(f1,"$L%d:\n",x);
 	lnum++;
 	label[++ltop]=lnum;
 }
-switch_break()
+void switch_break()
 {
 	switch_stack[++stop]=1;
 	fprintf(f1,"\t\tgoto $L%d\n",label[ltop-1]);
 }
-switch_nobreak()
+void switch_nobreak()
 {
 	switch_stack[++stop]=2;
 	lnum++;
 	label[++ltop]=lnum;
 	fprintf(f1,"\t\tgoto $L%d\n",label[ltop]);
 }
-switch_end()
+void switch_end()
 {
 	int x=label[ltop--];
 	fprintf(f1,"$L%d:\n",x);
@@ -311,7 +312,7 @@ switch_end()
 
 /* for symbol table*/
 
-check()
+void check()
 {
 	char temp[20];
 	strcpy(temp,yytext);
@@ -331,13 +332,13 @@ check()
 	}
 }
 
-setType()
+void setType()
 {
 	strcpy(type,yytext);
 }
 
 
-STMT_DECLARE()
+void STMT_DECLARE()
 {
 	char temp[20];
 	int i,flag;
@@ -364,7 +365,7 @@ STMT_DECLARE()
 	}
 }
 
-intermediateCode()
+void intermediateCode()
 {
 	int Labels[100000];
 	char buf[100];
